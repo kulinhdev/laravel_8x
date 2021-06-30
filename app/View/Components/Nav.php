@@ -12,9 +12,11 @@ class Nav extends Component
      * @return void
      */
     public $page;
-    public function __construct($page)
+    public $title;
+    public function __construct($page, $title)
     {
         $this->page = $page;
+        $this->title = $title;
     }
 
     /**

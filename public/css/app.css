@@ -1,8 +1,10 @@
 body {
-  color: #e0e0e0;
   background-color: #9e9b9b;
 }
 
-h1 {
-  color: aquamarine;
+.error {
+  border: 1px solid red;
+  border-radius: 5px;
+  color: red;
+  
 }
