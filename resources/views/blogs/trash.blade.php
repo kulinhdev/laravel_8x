@@ -34,7 +34,7 @@
         <tbody>
             @foreach ($blogs as $blog)
             <tr>
-                <form action="{{ route('restore') }}" method="POST">
+                <form action="{{ route('soft_delete') }}" method="POST">
                     @csrf
                     @method('put')
                     <th width="5%"><input class="form-control w-50 ml-2" type="checkbox" value="{{ $blog->id }}"
@@ -49,17 +49,18 @@
     </table>
     <div class="action text-left m-3">
         {{-- Restore --}}
-        <button type="submit" class="btn btn-success m-1">Restore <i class="far fa-trash-undo ml-1"></i></button>
+        <button type="submit" name="action" value="restore" class="btn btn-success m-1">Restore <i class="far fa-trash-undo ml-1"></i></button>
+        <button type="submit" name="action" value="delete"class="btn btn-danger m-1">Delete <i class="fal fa-trash-alt ml-1"></i></button>
         </form>
         {{-- Real Delete --}}
-        <form action="{{ route('delete') }}" method="POST" class="d-inline-block">
+        {{-- <form action="{{ route('softdelete') }}" method="POST" class="d-inline-block">
             @csrf
             @method('put')
             @foreach ($blogs as $blog)
             <input class="form-control w-50 ml-2" type="hidden" value="{{ $blog->id }}" name="id{{ $blog->id }}">
             @endforeach
             <button type="submit" class="btn btn-danger m-1">Delete <i class="fal fa-trash-alt ml-1"></i></button>
-        </form>
+        </form> --}}
     </div>
     <div>
 @endif

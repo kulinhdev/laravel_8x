@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Blogs\BlogAddRequest;
+use App\Http\Requests\Blogs\BlogEditRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Blogs;
+use Illuminate\Support\Facades\Storage;
 
 class BlogsController extends Controller
 {
@@ -14,6 +16,7 @@ class BlogsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    // *** Index - Show All *** \\
     public function index()
     {
         $blogs = Blogs::all();
@@ -28,6 +31,9 @@ class BlogsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    // *** Create - View Add *** \\
+
     public function create()
     {
         $page = 'Add Blog';
@@ -41,18 +47,12 @@ class BlogsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    // *** Store - Handle Date Store *** \\
     public function store(BlogAddRequest $request)
     {
         // *** Validate form *** \\
-        // $this->validate($request, [
-        //     'title' => 'required|unique:blogs', 
-        //     'image' => 'required|mimes:jpg,jpeg,png',
-        //     'body' => 'required',
-        // ], [
-        //     'title.required' => 'Tiêu đề không được bỏ rỗng !',
-        //     'image.required' => 'Bạn chưa chọn ảnh !',
-        //     'body.required' => 'Nội dung đề không được bỏ rỗng !',
-        // ]);
+        // Form BlogAddRequest
 
         $file = $request->file('image');
         $file_name = $file->getClientOriginalName('image');
@@ -83,12 +83,16 @@ class BlogsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    // *** Show - Show Item by Id *** \\
     public function show($id)
     {
-        $blog = Blogs::find($id);
-        dd($blog);
+        // Detail
+        $oneBlog = Blogs::find($id);
+        dd($oneBlog);
     }
 
+    // *** softDelete - Show View Trash *** \\
     public function softDelete()
     {
         $page = 'Trash';
@@ -99,33 +103,35 @@ class BlogsController extends Controller
         return view('blogs.trash', compact('page', 'title', 'blogs'));
     }
 
-    public function restoreDelete(Request $request)
-    {
+    // *** softDelete - Restore and Real Delete *** \\
+    public function softDeleteAction(Request $request) {
+        // Get action
+        $action = $request->action;
+        
         // Get id from request
         $allId = $request->all();
 
         // Slice Token and Method
-        $allId = array_slice($allId, 2); 
+        $allId = array_slice($allId, 2, -1);
+        
+        if($action == 'restore') {
+            // Restore
+            Blogs::withTrashed()->whereIn('id', $allId)->restore();
 
-        Blogs::withTrashed()->whereIn('id', $allId)->restore();
+            return redirect()->back()->with('success', 'Record recovery successful !');
+        } else {
+            // Delete
+            // Unlink Images
+            foreach ($allId as $id) {
+                $image = Blogs::onlyTrashed()->where('id', $id)->get();
+                unlink("images/" . $image[0]->image);
+            }
+            Blogs::withTrashed()->whereIn('id', $allId)->forceDelete();
 
-        return redirect()->back()->with('success', 'Record recovery successful !');
+            return redirect()->back()->with('success', 'Delete record successfully !');
+        }
+
     }
-
-    public function realDelete(Request $request)
-    {
-        // Get id from request
-        $allId = $request->all();
-
-        // Slice Token and Method
-        $allId = array_slice($allId, 2);
-
-        Blogs::withTrashed()->whereIn('id', $allId)->forceDelete();;
-
-        return redirect()->back()->with('success', 'Delete record successfully !');
-
-    }
-
 
     /**
      * Show the form for editing the specified resource.
@@ -133,10 +139,12 @@ class BlogsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    // *** Edit - Show Item by need Edit by Id*** \\
     public function edit($id)
     {
         $page = 'Edit Blog';
-        $title = 'Edit Blogs Page';
+        $title = 'Edit Blog Page';
 
         $blog = Blogs::find($id);
         return view('blogs.edit', compact('page', 'title', 'blog'));
@@ -149,11 +157,23 @@ class BlogsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+
+    // *** Update - Handle Date Update *** \\
+    public function update(BlogEditRequest $request, $id)
     {
+        $file = $request->file('image');
+        $file_name = $file->getClientOriginalName('image');
+
+        $image_name = Str::random(10) . '_' . $file_name;
+        if (file_exists('images/' . $image_name)) {
+            $image_name = Str::random(10) . '_' . $file_name;
+        }
+
+        $file->move('images', $image_name);
+        
         Blogs::where('id', $id)->update([
             'title' => $request->title,
-            'image' => 'laravel-bg-1.png',
+            'image' => $image_name,
             'body' => $request->body,
         ]);
 
@@ -166,6 +186,8 @@ class BlogsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    // *** Destroy - Temporarily delete the record *** \\
     public function destroy($id)
     {
         Blogs::find($id)->delete();

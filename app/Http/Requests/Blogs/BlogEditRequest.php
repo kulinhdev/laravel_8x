@@ -13,7 +13,7 @@ class BlogEditRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,21 @@ class BlogEditRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'title' => 'required|max:255|min:6',
+            'image' => 'required|mimes:jpg,jpeg,png',
+            'body' => 'required',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'title.required' => 'Tiêu đề không được bỏ rỗng !',
+            'title.max' => 'Tối đa 255 kí tự !',
+            'title.min' => 'Tối thiểu 6 kí tự !',
+            'image.required' => 'Bạn chưa chọn ảnh !',
+            'image.mimes' => 'Định dang ảnh phải là jpg, png or jpeg !',
+            'body.required' => 'Nội dung đề không được bỏ rỗng !',
         ];
     }
 }

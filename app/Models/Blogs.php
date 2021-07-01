@@ -16,8 +16,6 @@ class Blogs extends Model
 
     protected $primaryKey = 'id';
 
-    protected $dates = ['deleted_at'];
- 
     public $fillable = ['title', 'image', 'body'];
 
 
