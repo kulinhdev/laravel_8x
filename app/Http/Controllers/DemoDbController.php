@@ -18,6 +18,7 @@ class BlogController extends Controller
         // ->orWhere('title', 'LIKE', 'Learn%')
         // ->whereBetween('id', [1, 7])
         // ->orderBy('id', 'desc')
+        // ->whereIn('id', [1, 2, 3])
         // ->whereNotNull('title')
         // ->find(2)
         // ->average('id')        

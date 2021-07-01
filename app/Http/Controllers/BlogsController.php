@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Blogs\BlogAddRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Blogs;
@@ -16,6 +17,7 @@ class BlogsController extends Controller
     public function index()
     {
         $blogs = Blogs::all();
+
         $page = 'Home';
         $title = 'Home Page';
         return view('index', compact('page', 'title', 'blogs'));
@@ -39,44 +41,39 @@ class BlogsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BlogAddRequest $request)
     {
         // *** Validate form *** \\
-        $this->validate($request, [
-            'title' => 'required|unique:blogs', 
-            'image' => 'required',
-            'body' => 'required',
-        ], [
-            'title.required' => 'Tiêu đề không được bỏ rỗng !',
-            'image.required' => 'Bạn chưa chọn ảnh !',
-            'body.required' => 'Nội dung đề không được bỏ rỗng !',
-        ]);
+        // $this->validate($request, [
+        //     'title' => 'required|unique:blogs', 
+        //     'image' => 'required|mimes:jpg,jpeg,png',
+        //     'body' => 'required',
+        // ], [
+        //     'title.required' => 'Tiêu đề không được bỏ rỗng !',
+        //     'image.required' => 'Bạn chưa chọn ảnh !',
+        //     'body.required' => 'Nội dung đề không được bỏ rỗng !',
+        // ]);
 
-        if($request->hasFile('image')) {
-            $file = $request->file('image');
-            $file_name = $file->getClientOriginalName('image');
-            $extension = $file->getClientOriginalExtension('image');
-            $extension = Str::lower($extension);
+        $file = $request->file('image');
+        $file_name = $file->getClientOriginalName('image');
+        $extension = $file->getClientOriginalExtension('image');
+        $extension = Str::lower($extension);
 
-            if($extension == 'jpg' || $extension == 'jpeg' || $extension == 'png') {
-                $image_name = Str::random(10).'_'.$file_name;
-                if(file_exists('images/'.$image_name)) {
-                    $image_name = Str::random(10) . '_' . $file_name;
-                }
-
-                $file->move('images', $image_name);
-
-                Blogs::create([
-                    'title' => $request->title,
-                    'image' => $image_name,
-                    'body' => $request->body,
-                ]);
-
-                return redirect('/blogs');
-                
-            } else {
-                echo 'Định dạng ảnh không hợp lệ !';
+        if ($extension == 'jpg' || $extension == 'jpeg' || $extension == 'png') {
+            $image_name = Str::random(10) . '_' . $file_name;
+            if (file_exists('images/' . $image_name)) {
+                $image_name = Str::random(10) . '_' . $file_name;
             }
+
+            $file->move('images', $image_name);
+
+            Blogs::create([
+                'title' => $request->title,
+                'image' => $image_name,
+                'body' => $request->body,
+            ]);
+
+            return redirect('/blogs');
         }
     }
 
@@ -91,6 +88,44 @@ class BlogsController extends Controller
         $blog = Blogs::find($id);
         dd($blog);
     }
+
+    public function softDelete()
+    {
+        $page = 'Trash';
+        $title = 'Post deleted';
+
+        $blogs = Blogs::onlyTrashed()->get();
+
+        return view('blogs.trash', compact('page', 'title', 'blogs'));
+    }
+
+    public function restoreDelete(Request $request)
+    {
+        // Get id from request
+        $allId = $request->all();
+
+        // Slice Token and Method
+        $allId = array_slice($allId, 2); 
+
+        Blogs::withTrashed()->whereIn('id', $allId)->restore();
+
+        return redirect()->back()->with('success', 'Record recovery successful !');
+    }
+
+    public function realDelete(Request $request)
+    {
+        // Get id from request
+        $allId = $request->all();
+
+        // Slice Token and Method
+        $allId = array_slice($allId, 2);
+
+        Blogs::withTrashed()->whereIn('id', $allId)->forceDelete();;
+
+        return redirect()->back()->with('success', 'Delete record successfully !');
+
+    }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -133,10 +168,8 @@ class BlogsController extends Controller
      */
     public function destroy($id)
     {
-        $blog = Blogs::find($id);
+        Blogs::find($id)->delete();
 
-        $blog->delete();
-
-        return redirect('/blogs');
+        return redirect()->back()->with('success', 'Delete record successfully !');
     }
 }

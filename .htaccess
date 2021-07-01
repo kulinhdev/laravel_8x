@@ -1,0 +1,6 @@
+// Không cho truy cập vào file .env
+
+<Files ".env">
+    Order allow, deny
+    Deny form all
+</Files>

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Blogs;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BlogRequests extends FormRequest
+class BlogAddRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,22 +25,19 @@ class BlogRequests extends FormRequest
     {
         return [
             'title' => 'required|unique:blogs',
-            'image' => 'required',
+            'image' => 'required|mimes:jpg,jpeg,png',
             'body' => 'required',
         ];
     }
+
     public function messages()
     {
         return [
             'title.required' => 'Tiêu đề không được bỏ rỗng !',
+            'title.unique' => 'Tiêu đề này đã tồn tại !',
             'image.required' => 'Bạn chưa chọn ảnh !',
+            'image.mimes' => 'Định dang ảnh phải là jpg, png or jpeg !',
             'body.required' => 'Nội dung đề không được bỏ rỗng !',
         ];
-    }
-
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-        });
     }
 }

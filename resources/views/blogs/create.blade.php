@@ -19,7 +19,7 @@
             <div class="form-group">
                 <label for="image">Image: </label>
                 {{ old('image') }}
-                <input type="file" class="form-control-file @error('image') error @enderror" name="image" value="{{ old('image') }}">
+                <input type="file" class="form-control-file @error('image') error @enderror" name="image">
             </div>
             @error('image')
             <div class="alert alert-danger">{{ $message }}</div>
