@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Laravel 8x</title>
+    <title>{{ $siteTitle }}</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -27,6 +27,9 @@
     <footer>
         @include('layouts.footer')
     </footer>
+
+    <!-- Stack Revice By Push -->
+    @stack('scripts')
 
     <!-- Optional JavaScript -->
     @include('layouts.script')

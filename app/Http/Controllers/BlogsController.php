@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+// *** Validate Form  *** \\
 use App\Http\Requests\Blogs\BlogAddRequest;
 use App\Http\Requests\Blogs\BlogEditRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Blogs;
-use Illuminate\Support\Facades\Storage;
+
+use Illuminate\Support\Facades\Route;
+
 
 class BlogsController extends Controller
 {
@@ -24,6 +27,7 @@ class BlogsController extends Controller
         $page = 'Home';
         $title = 'Home Page';
         return view('index', compact('page', 'title', 'blogs'));
+        // return view('index', ['blogs' => $this->blogs->getAllPosts(), 'page' => $page, 'title' => $title]);
     }
 
     /**
@@ -65,7 +69,7 @@ class BlogsController extends Controller
                 $image_name = Str::random(10) . '_' . $file_name;
             }
 
-            $file->move('images', $image_name);
+            $file->move('uploads', $image_name);
 
             Blogs::create([
                 'title' => $request->title,
@@ -87,7 +91,10 @@ class BlogsController extends Controller
     // *** Show - Show Item by Id *** \\
     public function show($id)
     {
-        // Detail
+        // Route info
+        $route = Route::current();
+        dd($route);
+        // Detail Item
         $oneBlog = Blogs::find($id);
         dd($oneBlog);
     }
@@ -107,13 +114,12 @@ class BlogsController extends Controller
     public function softDeleteAction(Request $request) {
         // Get action
         $action = $request->action;
-        
+
         // Get id from request
         $allId = $request->all();
-
-        // Slice Token and Method
+        // Slice Token, Method and Action
         $allId = array_slice($allId, 2, -1);
-        
+
         if($action == 'restore') {
             // Restore
             Blogs::withTrashed()->whereIn('id', $allId)->restore();
@@ -169,8 +175,8 @@ class BlogsController extends Controller
             $image_name = Str::random(10) . '_' . $file_name;
         }
 
-        $file->move('images', $image_name);
-        
+        $file->move('uploads', $image_name);
+
         Blogs::where('id', $id)->update([
             'title' => $request->title,
             'image' => $image_name,
@@ -194,4 +200,5 @@ class BlogsController extends Controller
 
         return redirect()->back()->with('success', 'Delete record successfully !');
     }
+
 }

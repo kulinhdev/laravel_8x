@@ -1,0 +1,1 @@
+- Change colum table need add : composer require doctrine/dbal

@@ -2,26 +2,28 @@
 
 // Controller
 use App\Http\Controllers\BlogsController;
+use App\Http\Controllers\AuthController;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 
-// Route Blogs
-Route::redirect('/', 'blogs');
+Auth::routes();
 
-Route::resource('/blogs', BlogsController::class);
-Route::get('/trash', [BlogsController::class, 'softDelete'])->name('trash');
+Route::redirect('/', 'home');
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+// *** Route Blogs *** \\
+Route::resource('/blogs', BlogsController::class)->middleware('auth');
+Route::get('/trash', [BlogsController::class, 'softDelete'])->name('trash')->middleware('auth');
 Route::put('/soft-delete', [BlogsController::class, 'softDeleteAction'])->name('soft_delete');
 
-Route::put('/restore', [BlogsController::class, 'restoreDelete'])->name('restore');
-Route::put('/delete', [BlogsController::class, 'realDelete'])->name('delete');
-
+// 404 Page
 Route::fallback(function () {
-    echo '<h1>This page not found !</h1>';
+    return view('error');
 });
-
-
-
 
 

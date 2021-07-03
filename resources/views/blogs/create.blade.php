@@ -11,7 +11,7 @@
             @csrf
             <div class="form-group">
                 <label for="title">Title :</label>
-                <input class="form-control @error('title') error @enderror" type="text"id="title" name="title" placeholder="Title ..." value="{{ old('title') }}">
+                <input class="form-control @error('title') error @enderror" type="text"id="title" name="title" placeholder="Title ..." value="{{ old('title') }}" autofocus>
             </div>
             @error('title')
             <div class="alert alert-danger">{{ $message }}</div>

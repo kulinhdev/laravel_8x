@@ -26,5 +26,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Paginator::useBootstrap();
+
+        // View Share
+        view()->share('siteTitle', 'Laravel 8x Basic');
     }
 }

@@ -6,9 +6,9 @@
 </x-nav>
 
 @if(count($blogs) == 0)
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <span>No posts yet !</span><a class="ml-3" href="{{ route('blogs.create') }}">More posts here!</a>
-    </div>
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <span>No posts yet !</span><a class="ml-3" href="{{ route('blogs.create') }}">More posts here!</a>
+</div>
 @else
 
 @if (Session::has('success'))
@@ -22,17 +22,22 @@
 
 @foreach ($blogs as $blog)
 <div class="jumbotron p-5 my-5">
-    <img class="mt-3 mr-3 float-left" width="250px" height="150px" src="{{ asset('images/'.$blog->image) }}"
+    {{-- Image --}}
+    <img class="mt-3 mr-3 float-left" width="250px" height="150px" src="{{ asset('uploads/'.$blog->image) }}"
         alt="Image Blogs">
-    <h3 class="display-4"><a href="blog/{{ $blog->id }}">{{ $blog->title }}</a></h3>
-    <p class="lead">{{ $blog->body }}</p>
+    {{-- Title --}}
+    <h3 class="display-4"><a href="blogs/{{ $blog->id }}">{{ $blog->title }}</a></h3>
+    {{-- Content --}}
+    <p class="lead">{{ Str::limit($blog->body, 30, '...') }}</p>
+    {{-- Action --}}
     <div class="lead mt-3">
         <a class="btn btn-warning btn-md m-2" href="blogs/{{ $blog->id }}/edit" role="button">Edit <i
                 class="fad fa-edit"></i></a>
         <form class="d-inline-block" action="/blogs/{{ $blog->id }}" method="POST">
             @csrf
             @method('delete')
-            <button class="btn btn-danger btn-md m-2" type="submit">Delete <i class="fal fa-trash-alt pl-1"></i></button>
+            <button class="btn btn-danger btn-md m-2" type="submit">Delete <i
+                    class="fal fa-trash-alt pl-1"></i></button>
         </form>
     </div>
     <hr>

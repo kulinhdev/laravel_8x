@@ -12,7 +12,7 @@
             @method('PUT')
             <div class="form-group">
                 <label for="title">Title :</label>
-                <input type="text" class="form-control @error('title') error @enderror" id="title" name="title" value="{{ $blog->title }}">
+                <input type="text" class="form-control @error('title') error @enderror" id="title" name="title" value="{{ $blog->title }}" autofocus>
             </div>
             @error('title')
             <div class="alert alert-danger">{{ $message }}</div>
