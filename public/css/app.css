@@ -13,3 +13,7 @@ input[type='checkbox'] {
   height: 22px !important;
   box-shadow: none !important;
 } 
+
+.cursor {
+  cursor: pointer;
+}

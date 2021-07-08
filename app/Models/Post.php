@@ -4,19 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Blogs extends Model
+class Post extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'blogs';
-
     protected $primaryKey = 'id';
 
     public $fillable = ['title', 'image', 'body'];
-
 
 }

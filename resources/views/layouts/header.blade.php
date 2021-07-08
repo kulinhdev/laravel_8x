@@ -9,16 +9,44 @@
             <li class="nav-item {{ request()->is('home') ? 'active' : '' }}">
                 <a class="nav-link " href="/">Home</a>
             </li>
-            <li class="nav-item {{ request()->is('blogs') ? 'active' : '' }}">
-                <a class="nav-link " href="{{ route('blogs.index') }}">Blogs</a>
+            {{-- Posts --}}
+            <li class="nav-item {{ request()->is('posts*') ? 'active' : '' }} dropdown">
+                <a class="nav-link dropdown-toggle cursor" id="navbarDropdown" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Posts
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ route('posts.index') }}">All Posts</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ route('posts.create') }}">Add Posts</a>
+                    <a class="dropdown-item" href="{{ route('posts.trash') }}">Trashs Posts</a>
+                </div>
             </li>
-            <li class="nav-item {{ request()->is('blogs/create') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('blogs.create') }}">Add Blogs</a>
+            {{-- Category --}}
+            <li class="nav-item {{ request()->is('categories*') ? 'active' : '' }} dropdown">
+                <a class="nav-link dropdown-toggle cursor" id="navbarDropdown" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Categories
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ route('categories.index') }}">All Categories</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ route('categories.trash') }}">Trash Categories</a>
+                </div>
             </li>
-            <li class="nav-item {{ request()->is('trash') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('trash') }}">Trashs</a>
+            {{-- Product --}}
+            <li class="nav-item {{ request()->is('products*') ? 'active' : '' }} dropdown">
+                <a class="nav-link dropdown-toggle cursor" id="navbarDropdown" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Products
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ route('products.index') }}">All Products</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ route('products.create') }}">Add Product</a>
+                    <a class="dropdown-item" href="{{ route('products.trash') }}">Trashs Products</a>
+                </div>
             </li>
-
         </ul>
     </div>
     <div class="right-part">

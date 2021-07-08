@@ -7,7 +7,7 @@
 
 <div class="bg-white p-5 border border-success">
     <div class="col-md-6">
-        <form action="{{ route('blogs.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
                 <label for="title">Title :</label>

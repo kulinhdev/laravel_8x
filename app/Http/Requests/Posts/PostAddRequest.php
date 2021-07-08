@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Blogs;
+namespace App\Http\Requests\Posts;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BlogEditRequest extends FormRequest
+class PostAddRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class BlogEditRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|max:255|min:6',
+            'title' => 'required|unique:blogs',
             'image' => 'required|mimes:jpg,jpeg,png',
             'body' => 'required',
         ];
@@ -34,8 +34,7 @@ class BlogEditRequest extends FormRequest
     {
         return [
             'title.required' => 'Tiêu đề không được bỏ rỗng !',
-            'title.max' => 'Tối đa 255 kí tự !',
-            'title.min' => 'Tối thiểu 6 kí tự !',
+            'title.unique' => 'Tiêu đề này đã tồn tại !',
             'image.required' => 'Bạn chưa chọn ảnh !',
             'image.mimes' => 'Định dang ảnh phải là jpg, png or jpeg !',
             'body.required' => 'Nội dung đề không được bỏ rỗng !',

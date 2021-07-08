@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 // *** Validate Form  *** \\
-use App\Http\Requests\Blogs\BlogAddRequest;
-use App\Http\Requests\Blogs\BlogEditRequest;
+use App\Http\Requests\Posts\PostAddRequest;
+use App\Http\Requests\Posts\PostEditRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Models\Blogs;
+use App\Models\Post;
 
 use Illuminate\Support\Facades\Route;
 
 
-class BlogsController extends Controller
+class PostController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,12 +22,11 @@ class BlogsController extends Controller
     // *** Index - Show All *** \\
     public function index()
     {
-        $blogs = Blogs::all();
+        $posts = Post::all();
 
-        $page = 'Home';
-        $title = 'Home Page';
-        return view('index', compact('page', 'title', 'blogs'));
-        // return view('index', ['blogs' => $this->blogs->getAllPosts(), 'page' => $page, 'title' => $title]);
+        $page = 'Posts';
+        $title = 'All Posts';
+        return view('posts.index', compact('page', 'title', 'posts'));
     }
 
     /**
@@ -40,9 +39,9 @@ class BlogsController extends Controller
 
     public function create()
     {
-        $page = 'Add Blog';
-        $title = 'Add New Blogs';
-        return view('blogs.create', compact('page', 'title'));
+        $page = 'Add Posts';
+        $title = 'Add New Posts';
+        return view('posts.create', compact('page', 'title'));
     }
 
     /**
@@ -53,7 +52,7 @@ class BlogsController extends Controller
      */
 
     // *** Store - Handle Date Store *** \\
-    public function store(BlogAddRequest $request)
+    public function store(PostAddRequest $request)
     {
         // *** Validate form *** \\
         // Form BlogAddRequest
@@ -65,19 +64,19 @@ class BlogsController extends Controller
 
         if ($extension == 'jpg' || $extension == 'jpeg' || $extension == 'png') {
             $image_name = Str::random(10) . '_' . $file_name;
-            if (file_exists('images/' . $image_name)) {
+            if (file_exists('uploads/posts' . $image_name)) {
                 $image_name = Str::random(10) . '_' . $file_name;
             }
 
-            $file->move('uploads', $image_name);
+            $file->move('uploads/posts', $image_name);
 
-            Blogs::create([
+            Post::create([
                 'title' => $request->title,
                 'image' => $image_name,
                 'body' => $request->body,
             ]);
 
-            return redirect('/blogs');
+            return redirect('/posts');
         }
     }
 
@@ -94,24 +93,22 @@ class BlogsController extends Controller
         // Route info
         $route = Route::current();
         dd($route);
-        // Detail Item
-        $oneBlog = Blogs::find($id);
-        dd($oneBlog);
     }
 
     // *** softDelete - Show View Trash *** \\
     public function softDelete()
     {
-        $page = 'Trash';
-        $title = 'Post deleted';
+        $page = 'Posts Trash';
+        $title = 'Posts deleted';
 
-        $blogs = Blogs::onlyTrashed()->get();
+        $postsDeleted = Post::onlyTrashed()->get();
 
-        return view('blogs.trash', compact('page', 'title', 'blogs'));
+        return view('posts.trash', compact('page', 'title', 'postsDeleted'));
     }
 
     // *** softDelete - Restore and Real Delete *** \\
-    public function softDeleteAction(Request $request) {
+    public function softDeleteAction(Request $request)
+    {
         // Get action
         $action = $request->action;
 
@@ -120,23 +117,27 @@ class BlogsController extends Controller
         // Slice Token, Method and Action
         $allId = array_slice($allId, 2, -1);
 
-        if($action == 'restore') {
+        if ($action == 'restore') {
             // Restore
-            Blogs::withTrashed()->whereIn('id', $allId)->restore();
+            Post::withTrashed()->whereIn('id', $allId)->restore();
 
             return redirect()->back()->with('success', 'Record recovery successful !');
         } else {
             // Delete
             // Unlink Images
             foreach ($allId as $id) {
-                $image = Blogs::onlyTrashed()->where('id', $id)->get();
-                unlink("images/" . $image[0]->image);
+                $image = Post::onlyTrashed()->where('id', $id)->first();
+                $pathImg = "uploads/posts/" . $image->image;
+                // Check file exits
+                if (file_exists($pathImg)) {
+                    unlink($pathImg);
+                }
             }
-            Blogs::withTrashed()->whereIn('id', $allId)->forceDelete();
+
+            Post::withTrashed()->whereIn('id', $allId)->forceDelete();
 
             return redirect()->back()->with('success', 'Delete record successfully !');
         }
-
     }
 
     /**
@@ -149,11 +150,11 @@ class BlogsController extends Controller
     // *** Edit - Show Item by need Edit by Id*** \\
     public function edit($id)
     {
-        $page = 'Edit Blog';
-        $title = 'Edit Blog Page';
+        $page = 'Edit Posts';
+        $title = 'Edit Posts Page';
 
-        $blog = Blogs::find($id);
-        return view('blogs.edit', compact('page', 'title', 'blog'));
+        $post = Post::find($id);
+        return view('posts.edit', compact('page', 'title', 'post'));
     }
 
     /**
@@ -165,25 +166,25 @@ class BlogsController extends Controller
      */
 
     // *** Update - Handle Date Update *** \\
-    public function update(BlogEditRequest $request, $id)
+    public function update(PostEditRequest $request, $id)
     {
         $file = $request->file('image');
         $file_name = $file->getClientOriginalName('image');
 
         $image_name = Str::random(10) . '_' . $file_name;
-        if (file_exists('images/' . $image_name)) {
+        if (file_exists('uploads/posts/' . $image_name)) {
             $image_name = Str::random(10) . '_' . $file_name;
         }
 
-        $file->move('uploads', $image_name);
+        $file->move('uploads/posts', $image_name);
 
-        Blogs::where('id', $id)->update([
+        Post::where('id', $id)->update([
             'title' => $request->title,
             'image' => $image_name,
             'body' => $request->body,
         ]);
 
-        return redirect('/blogs');
+        return redirect('/posts');
     }
 
     /**
@@ -196,9 +197,8 @@ class BlogsController extends Controller
     // *** Destroy - Temporarily delete the record *** \\
     public function destroy($id)
     {
-        Blogs::find($id)->delete();
+        Post::find($id)->delete();
 
         return redirect()->back()->with('success', 'Delete record successfully !');
     }
-
 }

@@ -5,9 +5,9 @@
 <x-nav :title="$title" :page="$page" class="active">
 </x-nav>
 
-@if(count($blogs) == 0)
+@if(count($postsDeleted) == 0)
 <div class="alert alert-info alert-dismissible fade show" role="alert">
-    <span>No posts have been deleted yet !</span><a class="ml-3" href="{{ route('blogs.index') }}">All post !</a>
+    <span>No posts have been deleted yet !</span><a class="ml-3" href="{{ route('posts.index') }}">All Posts !</a>
 </div>
 @else
 
@@ -20,29 +20,36 @@
 </div>
 @endif
 
-<div class="soft-delete bg-light text-center mb-5">
-    <table class="table table-striped table-bordered table-hover ">
+<div class="soft-delete bg-light text-center mb-5 pb-3">
+    <table class="table table-striped table-bordered table-hover text-center">
         <thead>
             <tr>
                 <th><input value="checked" id="select-all" name="select-all" class="form-control w-50 ml-2 pt-0" type="checkbox"></th>
-                <th>Id</th>
+                <th>STT</th>
                 <th>Title</th>
                 <th>Image</th>
                 <th>Content</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($blogs as $blog)
+            @foreach ($postsDeleted as $post)
             <tr>
-                <form action="{{ route('soft_delete') }}" method="POST">
+                <form action="{{ route('posts.soft_delete') }}" method="POST">
                     @csrf
                     @method('put')
-                    <th width="5%"><input class="form-control w-50 ml-2" type="checkbox" value="{{ $blog->id }}"
-                            name="id{{ $blog->id }}"></th>
-                    <th width="5%" scope="row">{{ $blog->id }}</th>
-                    <td width="30%">{{ $blog->title }}</td>
-                    <td width="20%"><img class="w-75" src="{{ asset('uploads/'.$blog->image) }}" alt="Image Blogs"></td>
-                    <td>{{ $blog->body }}</td>
+                    <th width="5%">
+                        <input 
+                            class="form-control w-50 ml-2" 
+                            type="checkbox" 
+                            value="{{ $post->id }}"
+                            name="id{{ $post->id }}">
+                        </th>
+                    <th width="5%">{{ $loop->iteration }}</th>
+                    <td width="30%">{{ $post->title }}</td>
+                    <td width="20%">
+                        <img class="w-75" src="{{ asset('uploads/'.$post->image) }}" alt="Image Blogs">
+                    </td>
+                    <td>{{ Str::limit($post->body, 30, '...') }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -57,21 +64,4 @@
 @endif
 @endsection
 
-<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-        crossorigin="anonymous"></script>
-    
-<script>
-$(document).ready(function() {
-    $("#select-all").click(function (event) {
-        if (this.checked) {
-            $(":checkbox").each(function () {
-            this.checked = true;
-        });
-        } else {
-            $(":checkbox").each(function () {
-            this.checked = false;
-        });
-        }
-    });
-});
-</script>
+@include('components.script-slelct-all')
